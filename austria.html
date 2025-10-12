@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Disable caching so users always load the most recent station list -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Select Station - Amazon Wave Check</title>
+    
+    <link rel="stylesheet" href="style.css?v=20250910071128">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header class="site-header">
+        <a href="index.html">
+            <img loading="lazy" src="https://www.franchiseverband.com/typo3temp/assets/_processed_/b/c/csm_Logo_Amazon_78ff002b7a.png" alt="Amazon Logo" class="amazon-logo">
+        </a>
+    </header>
+
+    <main class="content-wrapper">
+        <section class="station-selection-section">
+            <h1>Please select your Station</h1>
+            
+            <div class="station-selector">
+                <a href="dap8.html" class="station-card">
+                    <img loading="lazy" class="mini-flag" src="https://upload.wikimedia.org/wikipedia/commons/4/41/Flag_of_Austria.svg" alt="Austrian Flag">
+                    <span>DAP8 (Premstätten)</span>
+                </a>
+                <a href="dvi3.html" class="station-card">
+                    <img loading="lazy" class="mini-flag" src="https://upload.wikimedia.org/wikipedia/commons/4/41/Flag_of_Austria.svg" alt="Austrian Flag">
+                    <span>DVI3 (Vienna)</span>
+                </a>
+                <a href="dvi2.html" class="station-card">
+                    <img loading="lazy" class="mini-flag" src="https://upload.wikimedia.org/wikipedia/commons/4/41/Flag_of_Austria.svg" alt="Austrian Flag">
+                    <span>DVI2 (Vienna)</span>
+                </a>
+                <a href="dap5.html" class="station-card">
+                    <img loading="lazy" class="mini-flag" src="https://upload.wikimedia.org/wikipedia/commons/4/41/Flag_of_Austria.svg" alt="Austrian Flag">
+                    <span>DAP5 (Klagenfurt)</span>
+                </a>
+                <a href="dvi1.html" class="station-card">
+                    <img loading="lazy" class="mini-flag" src="https://upload.wikimedia.org/wikipedia/commons/4/41/Flag_of_Austria.svg" alt="Austrian Flag">
+                    <span>DVI1 (Großebersdorf)</span>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; 2025 Developed & Coded by Karim Elbeih Badawy (DAP8)</p>
+    </footer>
+        
+    <script type="module" src="script.js?v=20250910071128"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js').then(reg => {
+      console.log('SW registered', reg.scope);
+    }).catch(err => console.warn('SW registration failed', err));
+  });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Disable caching to ensure the latest station page loads every time -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>DAP5 - Wave Check</title>
+    
+    <link rel="stylesheet" href="style.css?v=20250910071128">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+
+    <header class="site-header">
+        <a href="index.html" id="adminBtn" class="admin-button-link">Admin</a>
+
+        <a href="index.html">
+            <img loading="lazy" src="https://www.franchiseverband.com/typo3temp/assets/_processed_/b/c/csm_Logo_Amazon_78ff002b7a.png" alt="Amazon Logo" class="amazon-logo">
+        </a>
+    </header>
+
+    <main class="station-page-wrapper" data-station-id="DAP5">
+        
+        <h1 class="station-title">Wave Check: DAP5 (Klagenfurt)</h1>
+
+        <nav class="tab-nav">
+            <a href="#wave-check" class="tab-link active" data-tab="wave-check-content">Wave Check</a>
+            <a href="#caproster" class="tab-link" data-tab="caproster-content">CapRoster</a>
+            <a href="#dashboard" class="tab-link" data-tab="dashboard-content">Dashboard</a>
+            <a href="#da-list" class="tab-link" data-tab="da-list-content">DA-List</a>
+        </nav>
+
+        <div class="tab-content-container">
+
+            <div id="wave-check-content" class="tab-pane active">
+                <h3>Badge Scan</h3>
+                <form id="wave-check-form" class="scanner-area">
+                    <div id="scanner-output" class="scanner-placeholder"><p>Scan a driver's Badge ID to begin.</p></div>
+                    <input type="text" class="manual-badge-input" placeholder="Or enter badge ID manually...">
+                    <button type="submit" class="scan-button">Submit</button>
+                </form>
+            </div>
+
+            <div id="caproster-content" class="tab-pane">
+                <div class="roster-actions">
+                    <div class="roster-form">
+                        <h4>Add Single Driver to Roster</h4>
+                        <form id="add-roster-form" class="add-driver-form">
+                            <div class="form-field">
+                                <label for="roster-badgeId">Badge ID</label>
+                                <input id="roster-badgeId" type="text" name="badgeId" required>
+                            </div>
+                             <div class="form-field">
+                                <label for="roster-name">Name</label>
+                                <input id="roster-name" type="text" name="name" required>
+                            </div>
+                             <div class="form-field">
+                                <label for="roster-startTime">Start Time</label>
+                                <input id="roster-startTime" type="text" name="startTime" required>
+                            </div>
+                             <div class="form-field">
+                                <label for="roster-firmenname">Company Name</label>
+                                <input id="roster-firmenname" type="text" name="firmenname" required>
+                            </div>
+                            <button type="submit" class="form-full-width-btn">Add to Roster</button>
+                        </form>
+                    </div>
+                    <div class="roster-form">
+                        <h4>Create/Overwrite Roster in Bulk</h4>
+                        <form class="bulk-roster-form">
+                            <textarea placeholder="Paste roster list from a spreadsheet..."></textarea>
+                            <div class="bulk-buttons">
+                                <button type="submit" class="btn-process">Process Roster</button>
+                                <button type="button" id="reset-roster-btn" class="btn-reset">Reset Roster</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <h3>Today's Roster</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Transporter ID</th>
+                            <th>Badge ID</th>
+                            <th>Name</th>
+                            <th>Start Time</th>
+                            <th>Firmenname</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="roster-table-body"></tbody>
+                </table>
+            </div>
+
+            <div id="dashboard-content" class="tab-pane">
+                 <h3>Live Dashboard</h3>
+                <div class="dashboard-grid">
+                    <div class="stat-card"><h4>Total on Roster</h4><p id="total-drivers">0</p></div>
+                    <div class="stat-card"><h4>Checked In</h4><p id="checked-in-drivers">0</p></div>
+                    <div class="stat-card"><h4>Remaining</h4><p id="remaining-drivers">0</p></div>
+                    <div class="stat-card"><h4>On Rescue</h4><p id="rescue-drivers">0</p></div>
+                </div>
+                <h4>Check-in Progress</h4>
+                <div class="progress-bar-container">
+                    <div id="check-in-progress-bar" class="progress-bar" style="width: 0%;">0%</div>
+                </div>
+                <!-- Dashboard extras: place Drivers by Company and Waves side by side -->
+                <div class="dashboard-extras">
+                    <div class="company-stats" id="company-stats-container">
+                        <h4>Drivers by Company</h4>
+                    </div>
+                    <div class="wave-stats" id="wave-stats-container">
+                        <h4>Waves</h4>
+                        <div id="wave-buttons" class="wave-buttons"></div>
+                        <button id="wave-show-drivers-btn" class="missing-btn" type="button">Drivers</button>
+                        <ul id="wave-missing-list" class="wave-missing-list"></ul>
+                    </div>
+                </div>
+                <!-- Communication buttons for sending notifications via Slack or Amazon Chime -->
+                <div class="communication-buttons" id="communication-buttons">
+                    <button id="slack-btn" type="button" class="comm-btn slack-btn">Slack</button>
+                    <button id="chime-btn" type="button" class="comm-btn chime-btn">Chime</button>
+                </div>
+            </div>
+
+            <div id="da-list-content" class="tab-pane">
+                <div class="roster-actions">
+                    <div class="roster-form">
+                        <h4>Add Single Driver to Database</h4>
+                        <form id="add-da-form">
+                            <div class="form-field">
+                                <label for="da-userId">User ID</label>
+                                <input type="text" id="da-userId" name="userId" required>
+                            </div>
+                            <div class="form-field">
+                                <label for="da-name">Employee Name</label>
+                                <input type="text" id="da-name" name="name" required>
+                            </div>
+                            <div class="form-field">
+                                <label for="da-badgeId">Badge ID</label>
+                                <input type="text" id="da-badgeId" name="badgeId" required>
+                            </div>
+                            <div class="form-field">
+                                <label for="da-companyName">Company Name</label>
+                                <input type="text" id="da-companyName" name="companyName" required>
+                            </div>
+                            <div class="form-field">
+                                <label for="da-transporterId">Transporter ID</label>
+                                <input type="text" id="da-transporterId" name="transporterId" required>
+                            </div>
+                            <button type="submit" class="form-full-width-btn">Save to Database</button>
+                        </form>
+                    </div>
+                    <div class="roster-form">
+                        <h4>Upload Excel Data</h4>
+                        <form id="bulk-da-form">
+                            <div class="form-field">
+                                <label for="excel-upload">Select Excel File (.xlsx, .xls, .csv)</label>
+                                <input type="file" id="excel-upload" name="excelFile" class="file-input" accept=".xlsx, .xls, .csv" required>
+                            </div>
+                            <div class="bulk-buttons">
+                                <button type="submit" class="btn-process">Process & Save File</button>
+                                <button type="button" id="reset-da-list-btn" class="btn-reset">Reset Database</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <h3>Master Driver Database (DA-List)</h3>
+                <table class="data-table">
+                     <thead>
+                        <tr>
+                            <th>User ID</th>
+                            <th>Employee Name</th>
+                            <th>Badge ID</th>
+                            <th>Company Name</th>
+                            <th>Transporter ID</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="da-list-table-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; 2025 Developed & Coded by Karim Elbeih Badawy (DAP8)</p>
+    </footer>
+    
+    <div id="adminModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Admin Login</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="adminId">ID:</label>
+                    <input type="text" id="adminId" name="adminId" required>
+                </div>
+                <div class="form-group">
+                    <label for="adminPw">Password:</label>
+                    <input type="password" id="adminPw" name="adminPw" required>
+                </div>
+                <button type="submit" class="login-button">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="missing-drivers-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button-missing">&times;</span>
+            <h2 id="missing-modal-title">Missing Drivers</h2>
+            <ul id="missing-drivers-list">
+                </ul>
+        </div>
+    </div>
+
+    <script type="module" src="script.js?v=20250910071128"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js').then(reg => {
+      console.log('SW registered', reg.scope);
+    }).catch(err => console.warn('SW registration failed', err));
+  });
+}
+</script>
+</body>
+</html>

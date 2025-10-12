@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Disable caching to ensure the browser fetches the latest version of the site on each visit -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Amazon Wave Check</title>
+    
+    <link rel="stylesheet" href="style.css?v=20250910071128">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header class="site-header">
+        <!-- Login and Logout buttons for employees -->
+        <!-- Position login and logout buttons slightly left of the admin button -->
+        <a id="login-btn" href="#" onclick="showEmployeeLoginModal(); return false;" class="admin-button-link" style="right: 8rem;">Login</a>
+        <a id="logout-btn" href="#" class="admin-button-link" style="right: 8rem; display:none;">Logout</a>
+        <a href="admin.html" class="admin-button-link">Admin</a>
+        
+        <a href="index.html">
+            <img loading="lazy" src="https://www.franchiseverband.com/typo3temp/assets/_processed_/b/c/csm_Logo_Amazon_78ff002b7a.png" alt="Amazon Logo" class="amazon-logo">
+        </a>
+    </header>
+
+    <main class="content-wrapper">
+        <section class="greeting-section">
+            <h1>Welcome to Amazon Wave Check</h1>
+            <p>Please select your country to continue.</p>
+        </section>
+
+        <section class="country-selector">
+            <a href="austria.html" class="country-card">
+                <img loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/4/41/Flag_of_Austria.svg" alt="Flag of Austria">
+                <span>Austria</span>
+            </a>
+            <a href="germany.html" class="country-card">
+                <img loading="lazy" src="https://upload.wikimedia.org/wikipedia/en/b/ba/Flag_of_Germany.svg" alt="Flag of Germany">
+                <span>Germany</span>
+            </a>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; 2025 Developed & Coded by Karim Elbeih Badawy (DAP8)</p>
+    </footer>
+
+    <!-- Employee Login Modal -->
+    <div id="employeeLoginModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2 style="text-align:center; margin-bottom:1rem;">Employee Login</h2>
+            <!-- Choose login method -->
+            <div id="login-methods" class="login-methods">
+                <div class="login-card" data-method="email">
+                    <!-- At-sign icon for email/password login -->
+                    <div class="login-card-icon">@</div>
+                    <h3>Email &amp; Password</h3>
+                </div>
+                <div class="login-card" data-method="badge">
+                    <!-- Badge icon (ID card) -->
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path d="M6 4h36c1.1 0 2 .9 2 2v36c0 1.1-.9 2-2 2H6c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zm18 4a4 4 0 100 8 4 4 0 000-8zm0 10c-4.418 0-8 3.582-8 8v6h16v-6c0-4.418-3.582-8-8-8z"/></svg>
+                    <h3>Scan Badge</h3>
+                </div>
+            </div>
+            <!-- Email/password login form -->
+            <form id="employee-login-form-email" style="display:none; margin-top:1rem;" class="add-driver-form">
+                <div class="form-field">
+                    <label for="employee-login-email">Email</label>
+                    <input type="email" id="employee-login-email" placeholder="Enter your email…" required>
+                </div>
+                <div class="form-field">
+                    <label for="employee-login-password">Password</label>
+                    <input type="password" id="employee-login-password" placeholder="Enter your password…" required>
+                </div>
+                <button type="submit" class="form-full-width-btn">Log In</button>
+            </form>
+            <!-- Badge login form with scanning animation -->
+            <form id="employee-login-form-badge" style="display:none; margin-top:1rem;" class="scanner-area">
+                <div class="scanner-frame">
+                    <div class="badge-card"></div>
+                    <div class="scan-animation" id="badge-scan-animation"></div>
+                </div>
+                <input type="text" id="employee-login-badge" class="manual-badge-input" placeholder="Or enter your badge ID manually…">
+                <button type="submit" class="scan-button">Submit</button>
+            </form>
+            <div id="employee-login-error" class="login-error-message" style="display:none; margin-top:1rem;"></div>
+        </div>
+    </div>
+    
+    <script type="module" src="script.js?v=20250910071128"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js').then(reg => {
+      console.log('SW registered', reg.scope);
+    }).catch(err => console.warn('SW registration failed', err));
+  });
+}
+</script>
+</body>
+</html>

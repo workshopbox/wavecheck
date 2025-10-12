@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Disable caching to ensure the browser fetches the latest version of the admin interface on each visit -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Admin Dashboard – Wave Check</title>
+    <!-- Reuse the existing styles to match the look and feel of the rest of the site -->
+    <link rel="stylesheet" href="style.css?v=20250910071128">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header with a link back to the homepage -->
+    <header class="site-header">
+        <a href="index.html">
+            <img loading="lazy" src="https://www.franchiseverband.com/typo3temp/assets/_processed_/b/c/csm_Logo_Amazon_78ff002b7a.png" alt="Amazon Logo" class="amazon-logo">
+        </a>
+    </header>
+
+    <main class="content-wrapper">
+        <!-- LOGIN SECTION -->
+        <section id="login-section" class="admin-login-container">
+            <h2 style="text-align:center; margin-bottom:1.5rem;">Admin Login</h2>
+            <!-- Method selection cards for admin login -->
+            <div id="admin-login-methods" class="login-methods">
+                <div class="login-card" data-method="email">
+                    <!-- At-sign icon for email/password login -->
+                    <div class="login-card-icon">@</div>
+                    <h3>Email &amp; Password</h3>
+                </div>
+                <div class="login-card" data-method="badge">
+                    <!-- Badge icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path d="M6 4h36c1.1 0 2 .9 2 2v36c0 1.1-.9 2-2 2H6c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zm18 4a4 4 0 100 8 4 4 0 000-8zm0 10c-4.418 0-8 3.582-8 8v6h16v-6c0-4.418-3.582-8-8-8z"/></svg>
+                    <h3>Scan Badge</h3>
+                </div>
+            </div>
+            <!-- Email & password login form (hidden by default) -->
+            <form id="admin-login-form-email" style="display:none; margin-top:1rem;" class="add-driver-form">
+                <div class="form-field">
+                    <label for="admin-login-email">Email</label>
+                    <input type="email" id="admin-login-email" placeholder="Enter your email…" required>
+                </div>
+                <div class="form-field">
+                    <label for="admin-login-password">Password</label>
+                    <input type="password" id="admin-login-password" placeholder="Enter your password…" required>
+                </div>
+                <button type="submit" class="form-full-width-btn">Log In</button>
+            </form>
+            <!-- Badge login form (hidden by default) -->
+            <form id="admin-login-form-badge" style="display:none; margin-top:1rem;" class="scanner-area">
+                <div class="scanner-frame">
+                    <div class="badge-card"></div>
+                    <div class="scan-animation" id="admin-badge-scan-animation"></div>
+                </div>
+                <input type="text" id="admin-login-badge" class="manual-badge-input" placeholder="Or enter your badge ID…" required>
+                <button type="submit" class="scan-button">Submit</button>
+            </form>
+            <div id="login-error" class="login-error-message" style="display:none;">Invalid credentials. Please try again.</div>
+        </section>
+
+        <!-- ADMIN DASHBOARD (hidden until logged in) -->
+        <section id="admin-dashboard" style="display:none; width:100%; max-width:1200px;">
+            <h2 style="margin-bottom:2rem; text-align:center;">Admin Dashboard</h2>
+            <!-- Basic site information summary -->
+            <div class="dashboard-grid" style="margin-bottom:2rem;">
+                <div class="stat-card">
+                    <h4>Total Stations</h4>
+                    <p id="total-stations-count">20</p>
+                </div>
+                <div class="stat-card">
+                    <h4>Austrian Stations</h4>
+                    <p id="austrian-stations-count">5</p>
+                </div>
+                <div class="stat-card">
+                    <h4>German Stations</h4>
+                    <p id="german-stations-count">15</p>
+                </div>
+            </div>
+            <!-- Account management area -->
+            <div class="admin-grid">
+                <!-- Form to create new accounts -->
+                <div class="form-container">
+                    <h3>Create New Account</h3>
+                    <form id="create-account-form" style="display:flex; flex-direction:column; gap:1rem;">
+                        <!-- Name field for the user -->
+                        <div class="form-field">
+                            <label for="new-name">Name</label>
+                            <input type="text" id="new-name" name="newName" placeholder="User's name…" required>
+                        </div>
+                        <div class="form-field">
+                            <label for="new-email">Email</label>
+                            <input type="email" id="new-email" name="newEmail" placeholder="User's email…" required>
+                        </div>
+                        <div class="form-field">
+                            <label for="new-password">Password</label>
+                            <input type="password" id="new-password" name="newPassword" placeholder="Choose a password…" required>
+                        </div>
+                        <div class="form-field">
+                            <label for="new-badge-id">Badge ID</label>
+                            <input type="text" id="new-badge-id" name="newBadgeId" placeholder="Assign a badge ID…" required>
+                        </div>
+                        <div class="form-field">
+                            <label for="confirm-password">Confirm Password</label>
+                            <input type="password" id="confirm-password" name="confirmPassword" placeholder="Repeat the password…" required>
+                        </div>
+                        <div class="form-field">
+                            <label for="new-role">Role</label>
+                            <select id="new-role" name="newRole" required>
+                                <option value="Developer">Developer</option>
+                                <option value="L4+">L4+</option>
+                                <option value="L3">L3</option>
+                                <option value="L1">L1</option>
+                            </select>
+                        </div>
+                        <div class="form-field">
+                            <label>Accessible Stations</label>
+                            <div id="station-checklist" class="station-checklist">
+                                <!-- Dynamically populated checkboxes will go here -->
+                            </div>
+                        </div>
+                        <button type="submit" class="form-full-width-btn">Create Account</button>
+                    </form>
+                    <div id="create-account-message" class="login-error-message" style="display:none;"></div>
+                </div>
+                <!-- List of created users -->
+                <div class="user-list-container">
+                    <h3>Existing Accounts</h3>
+                    <table class="data-table" id="accounts-table">
+                        <thead>
+                            <tr><th>Name</th><th>Email</th><th>Badge ID</th><th>Role</th><th>Stations</th><th>Actions</th></tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Logs viewer -->
+            <div class="logs-container" style="margin-top:2rem;">
+                <h3>System Logs</h3>
+                <table class="data-table" id="logs-table">
+                    <thead>
+                        <tr><th>Time</th><th>User</th><th>Station</th><th>Action</th><th>Details</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+    <footer class="site-footer">
+        <p>&copy; 2025 Developed &amp; Coded by Karim Elbeih Badawy (DAP8)</p>
+    </footer>
+
+    <!-- Inline script to manage login and account creation -->
+    <script type="module">
+        // Import Firebase services for authentication and Firestore
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+        import { getFirestore, collection, getDocs, addDoc, updateDoc, doc, deleteDoc, query, orderBy, where } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+        // Import Firebase Authentication functions.  These allow us to create
+        // corresponding user accounts in Firebase Auth whenever a new account is
+        // created from the admin dashboard and to authenticate admins securely.
+        // Without this, employees defined in Firestore only will not be able to
+        // log in once Firestore rules enforce that `request.auth` must be
+        // non‑null.
+        // We revert to a client‑side only login for the admin panel.  Therefore
+        // we do not import Firebase Authentication functions.  User
+        // verification is performed entirely on the client by reading the
+        // accounts collection.
+        /*
+         * Firebase Authentication is intentionally **not** imported here.  This admin
+         * dashboard implements a legacy, client‑side only login and account
+         * creation mechanism which does not rely on Firebase Auth.  User
+         * verification and credential storage occur entirely within Firestore
+         * (and in the browser), which is insecure but mirrors the original
+         * application behavior prior to the migration attempt.  See
+         * script.js for a discussion of why this is a security risk.
+         */
+
+        // Predefined demo credentials (you can replace with real authentication logic)
+        const demoCredentials = {
+            email: 'admin@example.com',
+            password: 'admin123',
+            badge: '12345'
+        };
+
+        // Firebase configuration (same as used on station pages)
+        const firebaseConfig = {
+            apiKey: "AIzaSyALA7TACwHPpAGolV_aYxuVgBEWmizI6CA",
+            authDomain: "wave-check-cc19a.firebaseapp.com",
+            projectId: "wave-check-cc19a",
+            storageBucket: "wave-check-cc19a.appspot.com",
+            messagingSenderId: "448503442369",
+            appId: "1:448503442369:web:ff5123572f9c2386c69d40"
+        };
+        // Initialize Firebase app and Firestore
+        const firebaseApp = initializeApp(firebaseConfig);
+        const db = getFirestore(firebaseApp);
+        // We no longer initialize Firebase Auth.  All admin authentication is handled
+        // entirely on the client against the downloaded accounts list.
+        // Reference to the accounts collection in Firestore
+        const accountsCollectionRef = collection(db, 'accounts');
+
+        // Reference to the logs collection. Logs are shared with station
+        // pages so that all events (account creation, roster actions, etc.)
+        // can be reviewed from the admin dashboard.
+        const logsCollectionRefAdmin = collection(db, 'logs');
+
+        /**
+         * Add a log entry to the logs collection. Admin functions can call
+         * this to record account creation, updates, or other management
+         * actions. The timestamp is recorded in milliseconds. stationId
+         * is optional; account actions may not be tied to a station.
+         *
+         * @param {string} action - A short identifier for the event
+         * @param {string} details - Human readable description
+         * @param {string|null} stationId - Optional station ID
+         */
+        async function addLogAdmin(action, details, stationId = null) {
+            try {
+                await addDoc(logsCollectionRefAdmin, {
+                    timestamp: Date.now(),
+                    stationId: stationId,
+                    user: 'Admin',
+                    action: action,
+                    details: details
+                });
+            } catch (error) {
+                console.error('Error writing admin log:', error);
+            }
+        }
+
+        /**
+         * Load the most recent logs from Firestore and populate the logs table.
+         * This function retrieves up to 100 logs ordered by timestamp
+         * descending and renders them into the table body. Called once
+         * when the admin dashboard is shown.
+         */
+        async function loadLogs() {
+            const logsTableBody = document.querySelector('#logs-table tbody');
+            if (!logsTableBody) return;
+            logsTableBody.innerHTML = '';
+            try {
+                // Order logs by timestamp descending; limit to recent 100
+                const logsQuery = query(logsCollectionRefAdmin, orderBy('timestamp', 'desc'));
+                const snapshot = await getDocs(logsQuery);
+                let count = 0;
+                snapshot.forEach(docSnap => {
+                    if (count >= 100) return; // limit display to 100 logs
+                    const data = docSnap.data();
+                    const row = document.createElement('tr');
+                    const ts = data.timestamp ? new Date(data.timestamp).toLocaleString() : '';
+                    row.innerHTML = `<td>${ts}</td><td>${data.user || ''}</td><td>${data.stationId || ''}</td><td>${data.action || ''}</td><td>${data.details || ''}</td>`;
+                    logsTableBody.appendChild(row);
+                    count++;
+                });
+            } catch (error) {
+                console.error('Error loading logs:', error);
+            }
+        }
+
+        // Keep track of created accounts (fetched from Firestore)
+        let createdAccounts = [];
+        // Keep track of which account is currently being edited (null if creating new)
+        let editingAccountId = null;
+        // Define desired order of roles for sorting (Developer first, then L4+, L3, L1)
+        const roleOrder = ['Developer', 'L4+', 'L3', 'L1'];
+
+        /**
+         * Load existing accounts from Firestore into the page. This function
+         * retrieves all documents from the "accounts" collection and populates
+         * the createdAccounts array as well as the accounts table. Each row
+         * includes an Edit button that allows modifying the account details.
+         */
+        async function loadAccounts() {
+            createdAccounts = [];
+            accountsTableBody.innerHTML = '';
+            try {
+                const snapshot = await getDocs(accountsCollectionRef);
+                // Collect accounts into an array
+                const accArr = [];
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    accArr.push({ id: docSnap.id, ...data });
+                });
+                // Sort by role using the predefined order
+                accArr.sort((a, b) => {
+                    const ia = roleOrder.indexOf(a.role || '');
+                    const ib = roleOrder.indexOf(b.role || '');
+                    return ia - ib;
+                });
+                // Populate table and internal array
+                accArr.forEach(acc => {
+                    createdAccounts.push(acc);
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td>${acc.name || ''}</td><td>${acc.email || ''}</td><td>${acc.badgeId || ''}</td><td>${acc.role || ''}</td><td>${(acc.stations || []).join(', ') || 'None'}</td><td><button class="edit-btn" data-id="${acc.id}">Edit</button><button class="delete-btn" data-id="${acc.id}">Delete</button></td>`;
+                    accountsTableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error loading accounts:', error);
+            }
+        }
+
+        // Populate station checklist from an array of station codes
+        const stationCodes = [
+            'DAP8', 'DVI3', 'DVI2', 'DAP5', 'DVI1', // Austria
+            'DBB1', 'DBE1', 'DBE2', 'DMU1', 'DMU2',
+            'DNW1', 'DNW3', 'DNW7', 'DNW9', 'DHE1',
+            'DBW1', 'DTH1', 'DHB1', 'DNM6', 'DNM7',
+            'DHE3', 'DNM1', 'DSY2', 'DRP2'
+        ];
+
+        const checklistContainer = document.getElementById('station-checklist');
+        stationCodes.forEach(code => {
+            const wrapper = document.createElement('div');
+            wrapper.classList.add('station-checkbox');
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = `chk-${code}`;
+            checkbox.value = code;
+            const label = document.createElement('label');
+            label.setAttribute('for', `chk-${code}`);
+            label.textContent = code;
+            wrapper.appendChild(checkbox);
+            wrapper.appendChild(label);
+            checklistContainer.appendChild(wrapper);
+        });
+
+        // Login handling for admin page with two methods (email/password or badge)
+        const adminLoginMethods = document.getElementById('admin-login-methods');
+        const adminEmailForm = document.getElementById('admin-login-form-email');
+        const adminBadgeForm = document.getElementById('admin-login-form-badge');
+        const loginSection = document.getElementById('login-section');
+        const dashboardSection = document.getElementById('admin-dashboard');
+        const loginError = document.getElementById('login-error');
+
+        // Show the appropriate form when a method card is clicked
+        if (adminLoginMethods) {
+            const cards = adminLoginMethods.querySelectorAll('.login-card');
+            cards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const method = card.getAttribute('data-method');
+                    // Hide method selection
+                    adminLoginMethods.style.display = 'none';
+                    loginError.style.display = 'none';
+                    if (method === 'email' && adminEmailForm) {
+                        adminEmailForm.style.display = 'block';
+                        adminBadgeForm.style.display = 'none';
+                    } else if (method === 'badge' && adminBadgeForm) {
+                        adminBadgeForm.style.display = 'block';
+                        adminEmailForm.style.display = 'none';
+                    }
+                });
+            });
+        }
+
+        // Helper to perform authentication for admin login. Returns the
+        // matching account if credentials are valid, otherwise null.  This
+        // function checks the demo credentials first and then searches
+        // through the loaded accounts (createdAccounts) for a matching
+        // email/password or badge ID.
+        function authenticateAdmin(email, password, badge) {
+            // Check demo credentials
+            if ((email && password && email === demoCredentials.email && password === demoCredentials.password) ||
+                (badge && badge === demoCredentials.badge)) {
+                return { role: 'Developer' };
+            }
+            // Search created accounts
+            return createdAccounts.find(acc => (
+                (email && password && acc.email === email && acc.password === password) ||
+                (badge && acc.badgeId && acc.badgeId === badge)
+            )) || null;
+        }
+
+
+
+        // Submit handler for admin email/password login (client‑side only).  We
+        // check the demo credentials first, then search through the loaded
+        // accounts array.  Users with roles Developer, L4+ or L3 are allowed
+        // to access the admin dashboard.
+        if (adminEmailForm) {
+            adminEmailForm.addEventListener('submit', async event => {
+                event.preventDefault();
+                loginError.style.display = 'none';
+                // Ensure the accounts list is loaded before authentication
+                if (createdAccounts.length === 0) {
+                    try {
+                        await loadAccounts();
+                    } catch (e) {
+                        console.error('Error preloading accounts before login:', e);
+                    }
+                }
+                const email = document.getElementById('admin-login-email').value.trim();
+                const password = document.getElementById('admin-login-password').value.trim();
+                const user = authenticateAdmin(email, password, null);
+                if (user) {
+                    if (['Developer','L4+','L3'].includes(user.role)) {
+                        loginError.style.display = 'none';
+                        loginSection.style.display = 'none';
+                        dashboardSection.style.display = 'block';
+                        adminEmailForm.reset();
+                        // Log admin login
+                        addLogAdmin('adminLogin', `Admin logged in via email (${email})`, null);
+                        // Load accounts and logs into the dashboard
+                        loadAccounts();
+                        loadLogs();
+                    } else {
+                        loginError.textContent = 'You do not have permission to access the admin panel.';
+                        loginError.style.display = 'block';
+                    }
+                } else {
+                    loginError.textContent = 'Invalid credentials. Please try again.';
+                    loginError.style.display = 'block';
+                }
+            });
+        }
+
+        // Submit handler for admin badge login (client‑side only).  We search
+        // through the loaded accounts array to match on badge ID.  Only
+        // accounts with roles Developer, L4+, or L3 are allowed into the
+        // admin dashboard.
+        if (adminBadgeForm) {
+            adminBadgeForm.addEventListener('submit', async event => {
+                event.preventDefault();
+                loginError.style.display = 'none';
+                // Ensure the accounts list is loaded before authentication
+                if (createdAccounts.length === 0) {
+                    try {
+                        await loadAccounts();
+                    } catch (e) {
+                        console.error('Error preloading accounts before login:', e);
+                    }
+                }
+                const badge = document.getElementById('admin-login-badge').value.trim();
+                const user = authenticateAdmin(null, null, badge);
+                if (user) {
+                    if (['Developer','L4+','L3'].includes(user.role)) {
+                        loginError.style.display = 'none';
+                        loginSection.style.display = 'none';
+                        dashboardSection.style.display = 'block';
+                        adminBadgeForm.reset();
+                        addLogAdmin('adminLogin', `Admin logged in via badge (${badge})`, null);
+                        loadAccounts();
+                        loadLogs();
+                    } else {
+                        loginError.textContent = 'You do not have permission to access the admin panel.';
+                        loginError.style.display = 'block';
+                    }
+                } else {
+                    loginError.textContent = 'Invalid badge ID. Please try again.';
+                    loginError.style.display = 'block';
+                }
+            });
+        }
+
+        // Account creation and update handling
+        const createAccountForm = document.getElementById('create-account-form');
+        const createAccountMessage = document.getElementById('create-account-message');
+        const accountsTableBody = document.querySelector('#accounts-table tbody');
+        // Loading of accounts from Firestore will occur once the admin has successfully
+        // authenticated via Firebase Auth (see onAuthStateChanged above).  We do not
+        // load accounts here because Firestore rules require the user to be
+        // authenticated.  The button for creating accounts is still queried
+        // below.
+        const createAccountBtn = createAccountForm.querySelector('button[type="submit"]');
+
+        // ------------------------------------------------------------------
+        // LOAD ACCOUNTS ON PAGE LOAD
+        // ------------------------------------------------------------------
+        // When running in the legacy client‑side only login mode, we need the
+        // complete list of accounts available before a user attempts to sign
+        // into the admin dashboard.  Without preloading the accounts, the
+        // authenticateAdmin function has nothing to match against and will
+        // reject every credential except the hard‑coded demo credentials.  To
+        // ensure that createdAccounts is populated at startup, call
+        // loadAccounts() once after the accountsTableBody has been defined.
+        loadAccounts();
+
+        createAccountForm.addEventListener('submit', async event => {
+            event.preventDefault();
+            const name = document.getElementById('new-name').value.trim();
+            const email = document.getElementById('new-email').value.trim();
+            const password = document.getElementById('new-password').value.trim();
+            const confirmPassword = document.getElementById('confirm-password').value.trim();
+            const badgeId = document.getElementById('new-badge-id').value.trim();
+            const role = document.getElementById('new-role').value;
+            const selectedStations = Array.from(document.querySelectorAll('#station-checklist input[type="checkbox"]:checked')).map(chk => chk.value);
+            // Simple validation: all fields filled and passwords match
+            if (!name || !email || !password || password !== confirmPassword || !badgeId || !role) {
+                createAccountMessage.textContent = 'Please ensure the passwords match and all fields are filled.';
+                createAccountMessage.style.display = 'block';
+                return;
+            }
+            // Check for duplicate email when creating a new account
+            if (!editingAccountId && createdAccounts.some(acc => acc.email === email)) {
+                createAccountMessage.textContent = 'An account with this email already exists.';
+                createAccountMessage.style.display = 'block';
+                return;
+            }
+            // If editing an existing account
+            if (editingAccountId) {
+                try {
+                    // Update in Firestore
+                    const accountDocRef = doc(accountsCollectionRef, editingAccountId);
+                    await updateDoc(accountDocRef, { name, email, password, badgeId, role, stations: selectedStations });
+                    // Update in-memory array
+                    const idx = createdAccounts.findIndex(acc => acc.id === editingAccountId);
+                    if (idx > -1) {
+                        createdAccounts[idx] = { id: editingAccountId, name, email, password, badgeId, role, stations: selectedStations };
+                    }
+                    // Refresh accounts list to maintain sorting and actions
+                    await loadAccounts();
+                    // Log account update
+                    addLogAdmin('updateAccount', `Updated account ${email} (role: ${role})`, null);
+                    // Reload logs to reflect the update
+                    loadLogs();
+                    // Reset editing state and button text
+                    editingAccountId = null;
+                    createAccountBtn.textContent = 'Create Account';
+                } catch (error) {
+                    console.error('Error updating account:', error);
+                    createAccountMessage.textContent = 'An error occurred while updating the account.';
+                    createAccountMessage.style.display = 'block';
+                    return;
+                }
+            } else {
+                // Create new account
+                try {
+                    // Create the Firestore document for the account.  This stores
+                    // non‑authentication metadata like role, badge ID, and permitted
+                    // stations.  The plain‑text password remains in Firestore to
+                    // support legacy badge login flows.  **WARNING:** Storing
+                    // plaintext passwords is insecure and should only be used
+                    // temporarily; consider migrating to Firebase Auth once you
+                    // no longer need legacy badge logins.
+                    const docRef = await addDoc(accountsCollectionRef, { name, email, password, badgeId, role, stations: selectedStations });
+                    const newAccount = { id: docRef.id, name, email, password, badgeId, role, stations: selectedStations };
+                    createdAccounts.push(newAccount);
+                    // Refresh accounts list to maintain sorting and include delete button
+                    await loadAccounts();
+                    // Log new account creation
+                    addLogAdmin('createAccount', `Created account ${email} (role: ${role})`, null);
+                    // Reload logs to reflect the new entry
+                    loadLogs();
+                } catch (error) {
+                    console.error('Error creating account:', error);
+                    createAccountMessage.textContent = 'An error occurred while creating the account.';
+                    createAccountMessage.style.display = 'block';
+                    return;
+                }
+            }
+            // Clear form and hide message
+            createAccountForm.reset();
+            document.querySelectorAll('#station-checklist input[type="checkbox"]').forEach(chk => chk.checked = false);
+            createAccountMessage.style.display = 'none';
+        });
+
+        /**
+         * Click handler for editing an account. When the Edit button within the
+         * accounts table is clicked, the corresponding account data is
+         * prefilled into the creation form and the button text is updated to
+         * indicate an update action. Editing state is tracked via
+         * editingAccountId.
+         */
+        accountsTableBody.addEventListener('click', async event => {
+            const target = event.target;
+            // Handle delete button click
+            if (target && target.classList.contains('delete-btn')) {
+                const accId = target.dataset.id;
+                const account = createdAccounts.find(acc => acc.id === accId);
+                if (!account) return;
+                const confirmDelete = confirm(`Delete account ${account.email}? This action cannot be undone.`);
+                if (!confirmDelete) return;
+                try {
+                    await deleteDoc(doc(accountsCollectionRef, accId));
+                    // Remove from local array
+                    createdAccounts = createdAccounts.filter(acc => acc.id !== accId);
+                    // Refresh accounts list and logs
+                    await loadAccounts();
+                    addLogAdmin('deleteAccount', `Deleted account ${account.email} (role: ${account.role})`, null);
+                    loadLogs();
+                } catch (err) {
+                    console.error('Error deleting account:', err);
+                }
+                return;
+            }
+            // Handle edit button click
+            if (target && target.classList.contains('edit-btn')) {
+                const accId = target.dataset.id;
+                const account = createdAccounts.find(acc => acc.id === accId);
+                if (!account) return;
+                // Populate the form with the existing account values
+                document.getElementById('new-name').value = account.name || '';
+                document.getElementById('new-email').value = account.email || '';
+                document.getElementById('new-password').value = account.password || '';
+                document.getElementById('confirm-password').value = account.password || '';
+                document.getElementById('new-badge-id').value = account.badgeId || '';
+                document.getElementById('new-role').value = account.role || '';
+                // Set station checkboxes
+                const selectedSet = new Set(account.stations || []);
+                document.querySelectorAll('#station-checklist input[type="checkbox"]').forEach(chk => {
+                    chk.checked = selectedSet.has(chk.value);
+                });
+                // Set editing state and update button text
+                editingAccountId = accId;
+                createAccountBtn.textContent = 'Update Account';
+                createAccountMessage.style.display = 'none';
+                // Scroll to the form top if needed
+                window.scrollTo({ top: createAccountForm.offsetTop - 50, behavior: 'smooth' });
+            }
+        });
+
+        // ------------------------------------------------------------------
+        // THEME TOGGLE FOR ADMIN PAGE
+        // ------------------------------------------------------------------
+        // On the admin page we need to add the theme toggle button because
+        // script.js is not loaded here. This self‑invoking function inserts
+        // a button into the header that toggles the 'light-mode' class
+        // on the body and stores the preference in localStorage. It avoids
+        // duplicate buttons if called multiple times.
+        (function() {
+            const header = document.querySelector('.site-header');
+            if (!header) return;
+            // Prevent multiple toggles
+            if (document.getElementById('theme-toggle-btn')) return;
+            // Apply previously saved theme
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+            }
+            const btn = document.createElement('button');
+            btn.id = 'theme-toggle-btn';
+            btn.className = 'admin-button-link';
+            btn.textContent = document.body.classList.contains('light-mode') ? 'Dark Mode' : 'Light Mode';
+            btn.addEventListener('click', () => {
+                const isLight = document.body.classList.toggle('light-mode');
+                localStorage.setItem('theme', isLight ? 'light' : 'dark');
+                btn.textContent = isLight ? 'Dark Mode' : 'Light Mode';
+            });
+            header.appendChild(btn);
+        })();
+    </script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js').then(reg => {
+      console.log('SW registered', reg.scope);
+    }).catch(err => console.warn('SW registration failed', err));
+  });
+}
+</script>
+</body>
+</html>
