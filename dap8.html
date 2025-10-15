@@ -1,193 +1,241 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>DAP8 - Wave Check (Live Auto‑Sync)</title>
-  <style>
-    :root {
-      --bg: #0f1115;
-      --card: #171a21;
-      --text: #e8e8e8;
-      --muted: #a6adbb;
-      --accent: #ff9900; /* Amazon-ish */
-      --border: #2a2f3a;
-    }
-    * { box-sizing: border-box; }
-    html, body { margin:0; padding:0; background:var(--bg); color:var(--text); font: 14px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
-    header {
-      position: sticky; top:0;
-      display:flex; align-items:center; justify-content:space-between;
-      padding:14px 18px; background:linear-gradient(180deg, rgba(23,26,33,.95), rgba(23,26,33,.85));
-      border-bottom: 1px solid var(--border);
-      z-index: 10;
-    }
-    header h1 { margin:0; font-size:16px; letter-spacing:.4px; font-weight:700; }
-    header .badge { background: var(--accent); color:#111; font-weight:800; padding:4px 8px; border-radius: 8px; }
-    main { padding: 18px; max-width: 1100px; margin: 0 auto; }
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 14px;
-      box-shadow: 0 6px 20px rgba(0,0,0,.25);
-    }
-    .hint { color: var(--muted); font-size: 12px; margin: 8px 0 0; }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-      background: #12151c;
-      border-radius: 10px;
-      overflow: hidden;
-    }
-    th, td {
-      border-bottom: 1px solid var(--border);
-      padding: 10px 12px;
-      text-align: left;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    thead th { background: #10131a; color: #d7dce8; position: sticky; top: 56px; z-index: 5; }
-    tbody tr:hover { background: rgba(255,153,0,.06); }
-    .pill {
-      display:inline-block; padding:3px 8px; border-radius: 999px; font-size: 12px;
-      background: rgba(255,153,0,.15); color: var(--accent); border: 1px solid rgba(255,153,0,.35);
-    }
-    /* change indicators */
-    .flash-add    { animation: flashAdd .9s ease; }
-    .flash-remove { animation: flashRemove .9s ease; }
-    @keyframes flashAdd    { 0% { background: rgba(0,200,0,0.25);} 100%{ background: transparent;} }
-    @keyframes flashRemove { 0% { background: rgba(200,0,0,0.25);} 100%{ background: transparent;} }
-    footer { color: var(--muted); font-size: 12px; padding: 12px 18px; text-align: center; }
-    .status { display:flex; gap:12px; align-items:center; }
-    .dot { width:10px; height:10px; border-radius:50%; background:#888; }
-    .dot.on { background:#27c93f; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Disable caching to ensure the latest station page loads every time -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>DAP8 - Wave Check</title>
+    
+    <link rel="stylesheet" href="style.css?v=20250910071128">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
-  <header>
-    <h1>Wave Check · <span class="badge">DAP8</span></h1>
-    <div class="status"><span class="dot" id="live-dot"></span><span id="live-text">waiting for CapRoster…</span></div>
-  </header>
-  <main>
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
-        <div>
-          <div style="font-weight:700;">Drivers (Live Auto‑Sync)</div>
-          <div class="hint">This table updates automatically when a driver is added/removed on Amazon CapRoster. No full delete, just small changes.</div>
+
+    <header class="site-header">
+        <a href="index.html" id="adminBtn" class="admin-button-link">Admin</a>
+
+        <a href="index.html">
+            <img loading="lazy" src="https://www.franchiseverband.com/typo3temp/assets/_processed_/b/c/csm_Logo_Amazon_78ff002b7a.png" alt="Amazon Logo" class="amazon-logo">
+        </a>
+        <!-- DAP8 station bee logo added below the Amazon logo -->
+        <img loading="lazy" src="dap8-logo.png" alt="DAP8 Logo" class="dap8-logo">
+    </header>
+
+    <main class="station-page-wrapper" data-station-id="DAP8">
+        
+        <h1 class="station-title">Wave Check: DAP8 (Premstätten)</h1>
+
+        <nav class="tab-nav">
+            <a href="#wave-check" class="tab-link active" data-tab="wave-check-content">Wave Check</a>
+            <a href="#caproster" class="tab-link" data-tab="caproster-content">CapRoster</a>
+            <a href="#dashboard" class="tab-link" data-tab="dashboard-content">Dashboard</a>
+            <a href="#da-list" class="tab-link" data-tab="da-list-content">DA-List</a>
+        </nav>
+
+        <div class="tab-content-container">
+
+            <div id="wave-check-content" class="tab-pane active">
+                <h3>Badge Scan</h3>
+                <form id="wave-check-form" class="scanner-area">
+                    <div id="scanner-output" class="scanner-placeholder"><p>Scan a driver's Badge ID to begin.</p></div>
+                    <input type="text" class="manual-badge-input" placeholder="Or enter badge ID manually...">
+                    <button type="submit" class="scan-button">Submit</button>
+                </form>
+            </div>
+
+            <div id="caproster-content" class="tab-pane">
+                <div class="roster-actions">
+                    <div class="roster-form">
+                        <h4>Add Single Driver to Roster</h4>
+                        <form id="add-roster-form" class="add-driver-form">
+                            <div class="form-field">
+                                <label for="roster-badgeId">Badge ID</label>
+                                <input id="roster-badgeId" type="text" name="badgeId" required>
+                            </div>
+                             <div class="form-field">
+                                <label for="roster-name">Name</label>
+                                <input id="roster-name" type="text" name="name" required>
+                            </div>
+                             <div class="form-field">
+                                <label for="roster-startTime">Start Time</label>
+                                <input id="roster-startTime" type="text" name="startTime" required>
+                            </div>
+                             <div class="form-field">
+                                <label for="roster-firmenname">Company Name</label>
+                                <input id="roster-firmenname" type="text" name="firmenname" required>
+                            </div>
+                            <button type="submit" class="form-full-width-btn">Add to Roster</button>
+                        </form>
+                    </div>
+                    <div class="roster-form">
+                        <h4>Create/Overwrite Roster in Bulk</h4>
+                        <form class="bulk-roster-form">
+                            <textarea placeholder="Paste roster list from a spreadsheet..."></textarea>
+                            <div class="bulk-buttons">
+                                <button type="submit" class="btn-process">Process Roster</button>
+                                <button type="button" id="reset-roster-btn" class="btn-reset">Reset Roster</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <h3>Today's Roster</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Transporter ID</th>
+                            <th>Badge ID</th>
+                            <th>Name</th>
+                            <th>Start Time</th>
+                            <th>Firmenname</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="roster-table-body"></tbody>
+                </table>
+            </div>
+
+            <div id="dashboard-content" class="tab-pane">
+                 <h3>Live Dashboard</h3>
+                <div class="dashboard-grid">
+                    <div class="stat-card"><h4>Total on Roster</h4><p id="total-drivers">0</p></div>
+                    <div class="stat-card"><h4>Checked In</h4><p id="checked-in-drivers">0</p></div>
+                    <div class="stat-card"><h4>Remaining</h4><p id="remaining-drivers">0</p></div>
+                    <div class="stat-card"><h4>On Rescue</h4><p id="rescue-drivers">0</p></div>
+                </div>
+                <h4>Check-in Progress</h4>
+                <div class="progress-bar-container">
+                    <div id="check-in-progress-bar" class="progress-bar" style="width: 0%;">0%</div>
+                </div>
+                <!-- Dashboard extras: place Drivers by Company and Waves side by side -->
+                <div class="dashboard-extras">
+                    <div class="company-stats" id="company-stats-container">
+                        <h4>Drivers by Company</h4>
+                    </div>
+                    <div class="wave-stats" id="wave-stats-container">
+                        <h4>Waves</h4>
+                        <div id="wave-buttons" class="wave-buttons"></div>
+                        <button id="wave-show-drivers-btn" class="missing-btn" type="button">Drivers</button>
+                        <ul id="wave-missing-list" class="wave-missing-list"></ul>
+                    </div>
+                </div>
+                <!-- Communication buttons for sending notifications via Slack or Amazon Chime -->
+                <div class="communication-buttons" id="communication-buttons">
+                    <button id="slack-btn" type="button" class="comm-btn slack-btn">Slack</button>
+                    <button id="chime-btn" type="button" class="comm-btn chime-btn">Chime</button>
+                </div>
+            </div>
+
+            <div id="da-list-content" class="tab-pane">
+                <div class="roster-actions">
+                    <div class="roster-form">
+                        <h4>Add Single Driver to Database</h4>
+                        <form id="add-da-form">
+                            <div class="form-field">
+                                <label for="da-userId">User ID</label>
+                                <input type="text" id="da-userId" name="userId" required>
+                            </div>
+                            <div class="form-field">
+                                <label for="da-name">Employee Name</label>
+                                <input type="text" id="da-name" name="name" required>
+                            </div>
+                            <div class="form-field">
+                                <label for="da-badgeId">Badge ID</label>
+                                <input type="text" id="da-badgeId" name="badgeId" required>
+                            </div>
+                            <div class="form-field">
+                                <label for="da-companyName">Company Name</label>
+                                <input type="text" id="da-companyName" name="companyName" required>
+                            </div>
+                            <div class="form-field">
+                                <label for="da-transporterId">Transporter ID</label>
+                                <input type="text" id="da-transporterId" name="transporterId" required>
+                            </div>
+                            <button type="submit" class="form-full-width-btn">Save to Database</button>
+                        </form>
+                    </div>
+                    <div class="roster-form">
+                        <h4>Upload Excel Data</h4>
+                        <form id="bulk-da-form">
+                            <div class="form-field">
+                                <label for="excel-upload">Select Excel File (.xlsx, .xls, .csv)</label>
+                                <input type="file" id="excel-upload" name="excelFile" class="file-input" accept=".xlsx, .xls, .csv" required>
+                            </div>
+                            <div class="bulk-buttons">
+                                <button type="submit" class="btn-process">Process & Save File</button>
+                                <button type="button" id="reset-da-list-btn" class="btn-reset">Reset Database</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <h3>Master Driver Database (DA-List)</h3>
+                <table class="data-table">
+                     <thead>
+                        <tr>
+                            <th>User ID</th>
+                            <th>Employee Name</th>
+                            <th>Badge ID</th>
+                            <th>Company Name</th>
+                            <th>Transporter ID</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="da-list-table-body"></tbody>
+                </table>
+            </div>
         </div>
-        <div class="pill" id="last-update">last update: —</div>
-      </div>
+    </main>
 
-      <table id="drivers-table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Badge ID</th>
-            <th>Company</th>
-            <th>Phone</th>
-            <th>Email</th>
-            <th>Transporter ID</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+    <footer class="site-footer">
+        <p>&copy; 2025 Developed & Coded by Karim Elbeih Badawy (DAP8)</p>
+    </footer>
+    
+    <div id="adminModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Admin Login</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="adminId">ID:</label>
+                    <input type="text" id="adminId" name="adminId" required>
+                </div>
+                <div class="form-group">
+                    <label for="adminPw">Password:</label>
+                    <input type="password" id="adminPw" name="adminPw" required>
+                </div>
+                <button type="submit" class="login-button">Login</button>
+            </form>
+        </div>
     </div>
-  </main>
 
-  <footer>Live delta listener is enabled. Keep your CapRoster page open for syncing.</footer>
+    <div id="missing-drivers-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button-missing">&times;</span>
+            <h2 id="missing-modal-title">Missing Drivers</h2>
+            <ul id="missing-drivers-list">
+                </ul>
+        </div>
+    </div>
 
-  <!-- Live delta listener (no cloud needed) -->
-  <script>
-  (function() {
-    const tbody = document.querySelector('#drivers-table tbody');
-    const liveDot = document.getElementById('live-dot');
-    const liveText = document.getElementById('live-text');
-    const lastUpdate = document.getElementById('last-update');
-
-    function setLive(on) {
-      if (!liveDot || !liveText) return;
-      liveDot.classList.toggle('on', !!on);
-      liveText.textContent = on ? 'live' : 'waiting for CapRoster…';
-    }
-
-    function stamp() {
-      const s = new Date().toLocaleString();
-      if (lastUpdate) lastUpdate.textContent = 'last update: ' + s;
-    }
-
-    function keyOf(d) {
-      // Prefer badgeId; fallback to transporterId
-      const badge = (d && d.badgeId || '').trim();
-      const tid   = (d && d.transporterId || '').trim();
-      return badge || tid || '';
-    }
-    function rowSelector(key) { return 'tr[data-key="' + CSS.escape(key) + '"]'; }
-
-    function renderRow(d) {
-      const tr = document.createElement('tr');
-      tr.setAttribute('data-key', keyOf(d));
-      tr.innerHTML = [
-        '<td>' + (d.name || '') + '</td>',
-        '<td>' + (d.badgeId || '') + '</td>',
-        '<td>' + (d.company || '') + '</td>',
-        '<td>' + (d.phone || '') + '</td>',
-        '<td>' + (d.email || '') + '</td>',
-        '<td>' + (d.transporterId || '') + '</td>'
-      ].join('');
-      return tr;
-    }
-
-    function addDriver(d) {
-      const key = keyOf(d);
-      if (!key) return;
-      const existing = tbody.querySelector(rowSelector(key));
-      if (existing) {
-        const newRow = renderRow(d);
-        newRow.classList.add('flash-add');
-        existing.replaceWith(newRow);
-      } else {
-        const tr = renderRow(d);
-        tr.classList.add('flash-add');
-        tbody.appendChild(tr);
-      }
-    }
-
-    function removeDriver(d) {
-      const key = keyOf(d);
-      if (!key) return;
-      const existing = tbody.querySelector(rowSelector(key));
-      if (existing) {
-        existing.classList.add('flash-remove');
-        setTimeout(() => existing.remove(), 280);
-      }
-    }
-
-    function applyDelta(added, removed) {
-      if ((added && added.length) || (removed && removed.length)) {
-        setLive(true);
-        stamp();
-      }
-      // Add first, then remove — smoother
-      (added || []).forEach(addDriver);
-      (removed || []).forEach(removeDriver);
-    }
-
-    window.addEventListener('message', (event) => {
-      const msg = event.data;
-      if (!msg || msg.type !== 'WAVE_CHECK_DELTA') return;
-      try {
-        applyDelta(msg.added || [], msg.removed || []);
-      } catch (e) {
-        console.error('[WaveCheck] failed to apply delta', e);
-      }
-    });
-
-    // If no messages arrive for a while, show 'waiting'
-    setLive(false);
-  })();
-  </script>
+    <script type="module" src="script.js?v=20250910071128"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js').then(reg => {
+      console.log('SW registered', reg.scope);
+    }).catch(err => console.warn('SW registration failed', err));
+  });
+}
+</script>
 </body>
 </html>
